@@ -9,7 +9,7 @@ branding:
 inputs:
   version:
     description: >-
-      Exact version of @geslar/cli to install (for example 1.2.3). Required: there is no default and no range or tag
+      Exact version of @geslar/cli to install (for example 1.2.3, or an exact pre-release such as 1.0.0-rc.1). Required: there is no default and no range or tag
       (such as latest) is accepted, so the code that holds your token never changes without you changing this line.
     required: true
   secrets:

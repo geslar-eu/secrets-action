@@ -42,7 +42,7 @@ Each line of `secrets` is `NAME=geslar://vault/item[/field]`. Vaults and items a
 
 | Input | Required | Meaning |
 |---|---|---|
-| `version` | yes | Exact `@geslar/cli` version, `x.y.z`. No default, no range, no tag (`latest` is refused). |
+| `version` | yes | Exact `@geslar/cli` version: `x.y.z`, or one exact pre-release such as `1.0.0-rc.1`. No default, no range, no tag (`latest` and `next` are refused). |
 | `secrets` | yes | The list above. |
 
 The token is deliberately **not** an input: inputs appear in the invocation log. Pass it as the `env:` of the step, from a repository or environment **secret** (never from `vars`).

@@ -343,12 +343,20 @@ test_install_uses_the_exact_version_without_scripts_and_adds_the_path() {
 test_install_refuses_everything_but_an_exact_version() {
   make_fake_npm
   local bad
-  for bad in "" "latest" "^1.2.3" "~1.2.3" "1.2" "1" "1.2.x" "*" ">=1.0.0" "1.2.3-rc.1" "1.2.3 " "v1.2.3" "1.2.3;rm -rf /"; do
+  for bad in "" "latest" "next" "^1.2.3" "~1.2.3" "1.2" "1" "1.2.x" "*" ">=1.0.0" "1.2.3-" "1.2.3-rc..1" "1.2.3-rc.1+build" "1.2.3 " "v1.2.3" "1.2.3;rm -rf /" "1.2.3 || 9.9.9"; do
     : >"$FAKE_DIR/npm_args"
     run_install "$bad"
     assert "refused: '$bad'" [ "$STATUS" -ne 0 ] || return 1
     assert "npm was not called for: '$bad'" [ ! -s "$FAKE_DIR/npm_args" ] || return 1
   done
+}
+
+test_install_accepts_an_exact_prerelease_for_the_trial_release() {
+  make_fake_npm
+  printf '1.0.0-rc.1\n' >"$FAKE_DIR/version"
+  run_install "1.0.0-rc.1"
+  assert "exit 0" [ "$STATUS" -eq 0 ] || return 1
+  assert "installed by its exact version" contains "$(cat "$FAKE_DIR/npm_args")" "@geslar/cli@1.0.0-rc.1" || return 1
 }
 
 test_install_fails_when_the_binary_reports_another_version() {

@@ -10,8 +10,9 @@ fail() {
 }
 
 version=${GESLAR_CLI_VERSION-}
-if ! [[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-  fail "The 'version' input must be an exact version like 1.2.3 (no ranges, no tags such as latest)."
+# x.y.z, optionally with ONE exact pre-release suffix (1.0.0-rc.1): the trial release is installed by its exact version too.
+if ! [[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z]+(\.[0-9A-Za-z]+)*)?$ ]]; then
+  fail "The 'version' input must be an exact version like 1.2.3 or 1.0.0-rc.1 (no ranges, no tags such as latest)."
 fi
 runner_temp=${RUNNER_TEMP-}
 if [ -z "$runner_temp" ]; then
