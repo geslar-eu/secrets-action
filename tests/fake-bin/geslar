@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# A stand-in for the real CLI, used only by tests/run.sh. Behaviour comes from $FAKE_DIR:
+#   map          lines "<ref><TAB><value file>"; an unknown ref prints an error to stderr and exits 4
+#   version      what `--version` prints
+#   calls        every invocation is appended here (argv, one line)
+#   env.<n>      the environment of the n-th `read` call (so a test can prove nothing leaked into the child)
+set -u
+if [ "${1-}" = "--version" ]; then
+  cat "$FAKE_DIR/version"
+  exit 0
+fi
+if [ "${1-}" != "read" ]; then
+  printf 'fake geslar: unsupported command %s\n' "${1-}" >&2
+  exit 2
+fi
+ref=${2-}
+printf '%s\n' "$*" >>"$FAKE_DIR/calls"
+n=$(wc -l <"$FAKE_DIR/calls" | tr -d ' ')
+env >"$FAKE_DIR/env.$n"
+while IFS=$'\t' read -r r file; do
+  if [ "$r" = "$ref" ]; then
+    cat "$file"
+    exit 0
+  fi
+done <"$FAKE_DIR/map"
+printf 'unresolvable reference: %s\n::set-output name=x::y\n' "$ref" >&2
+exit 4

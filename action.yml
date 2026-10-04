@@ -1,0 +1,44 @@
+name: Geslar secrets
+description: Loads secrets from Geslar into the job environment, masked. Needs a Geslar service account token as GESLAR_SERVICE_TOKEN.
+author: Geslar d.o.o.
+
+branding:
+  icon: lock
+  color: blue
+
+inputs:
+  version:
+    description: >-
+      Exact version of @geslar/cli to install (for example 1.2.3, or an exact pre-release such as 1.0.0-rc.1). Required: there is no default and no range or tag
+      (such as latest) is accepted, so the code that holds your token never changes without you changing this line.
+    required: true
+  secrets:
+    description: >-
+      The secrets to load, one per line: NAME=geslar://vault/item[/field]. Vaults and items are named, not numbered;
+      the field defaults to password. Blank lines and lines starting with # are ignored.
+    required: true
+
+# The token is deliberately NOT an input (inputs show up in the invocation log). Pass it as the step's environment:
+#   env:
+#     GESLAR_SERVICE_TOKEN: ${{ secrets.GESLAR_SERVICE_TOKEN }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      with:
+        node-version: 22
+
+    - name: Install the Geslar CLI (exact version, no install scripts)
+      shell: bash
+      run: bash "$GESLAR_ACTION_PATH/scripts/install.sh"
+      env:
+        GESLAR_ACTION_PATH: ${{ github.action_path }}
+        GESLAR_CLI_VERSION: ${{ inputs.version }}
+
+    - name: Load Geslar secrets (masked before export)
+      shell: bash
+      run: bash "$GESLAR_ACTION_PATH/scripts/load.sh"
+      env:
+        GESLAR_ACTION_PATH: ${{ github.action_path }}
+        GESLAR_SECRETS_INPUT: ${{ inputs.secrets }}

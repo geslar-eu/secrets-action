@@ -1,0 +1,68 @@
+name: e2e (manual, real runners, real CLI)
+
+# Run by hand (Actions → e2e → Run workflow) against the trial release of @geslar/cli. Needs the repository secret
+# GESLAR_SERVICE_TOKEN of a TEST service account that can read one probe item in a test Vault — see RELEASING.md.
+# It proves the two things the fake-CLI tests cannot: that a calling step's `env:` reaches the composite action's inner
+# steps, and that the real CLI resolves a reference with a service token.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Exact @geslar/cli version to test (for example 1.0.0-rc.1)
+        required: true
+        type: string
+      reference:
+        description: geslar:// reference of the probe secret in the test Vault
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    name: e2e (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-14, windows-2022]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: load the probe secret with the action under test
+        uses: ./
+        with:
+          version: ${{ inputs.version }}
+          secrets: |
+            PROBE=${{ inputs.reference }}
+        env:
+          GESLAR_SERVICE_TOKEN: ${{ secrets.GESLAR_SERVICE_TOKEN }}
+
+      # The probe value is a TEST value. It is printed on purpose: the raw log must show *** and never the value.
+      - name: the value reached the environment and is masked in the log
+        shell: bash
+        run: |
+          test -n "$PROBE"
+          echo "probe length: ${#PROBE}"
+          echo "probe as printed: $PROBE"
+
+      - name: negative control — without the token the action must fail
+        id: no_token
+        continue-on-error: true
+        uses: ./
+        with:
+          version: ${{ inputs.version }}
+          secrets: |
+            PROBE2=${{ inputs.reference }}
+        env:
+          GESLAR_SERVICE_TOKEN: ""
+
+      - name: the negative control really failed
+        if: steps.no_token.outcome != 'failure'
+        shell: bash
+        run: |
+          echo "the action did not fail without a token"
+          exit 1
