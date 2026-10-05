@@ -15,10 +15,12 @@ Please include, as far as you have it: the action reference you used (commit SHA
 
 ## What to expect
 
-- **Acknowledgement within 3 working days.**
-- An initial assessment, with our view of severity and whether we consider it in scope, **within 10 working days**.
-- Progress updates at least every 14 days until the report is closed.
-- Credit in the release notes and in the published advisory, under whatever name or handle you prefer, unless you ask us not to.
+These are targets we work to, not guarantees:
+
+- We aim to **acknowledge** your report **within 3 working days**.
+- We aim to give an **initial assessment**, with our view of severity and whether we consider it in scope, **within 10 working days**.
+- We aim to **update you at least every 14 days** until the report is closed.
+- We are happy to **credit you** in the release notes and in the published advisory, under whatever name or handle you prefer, unless you ask us not to.
 
 We ask you to give us a reasonable window to ship a fix before publishing. We will agree a disclosure date with you rather than impose one, and we will not ask you to stay quiet indefinitely.
 
