@@ -2,7 +2,7 @@
 
 A GitHub Action that loads secrets from [Geslar](https://geslar.app) into a workflow job, **masked**, using a Geslar **service account** token.
 
-> **Status: not released yet.** There is no `v1` tag and no `v1.0.0` release; pin to a full commit SHA until there is (see [Pin it](#pin-it)). The `@geslar/cli` version this action installs is yours to choose with the `version` input and has to be a release that supports service tokens.
+> **Status.** Pin this action by full commit SHA (see [Pin it](#pin-it)). Release tags (`v1.0.0` and the moving `v1`) are created by a maintainer by hand after the checks in [RELEASING.md](./RELEASING.md); a tag is for people who accept a moving reference. The `@geslar/cli` version the action installs is yours to choose with the `version` input. It has to be **1.0.0 or newer** (the trial version `1.0.0-rc.1` also works), because earlier versions do not know service tokens.
 
 ## What it does
 
@@ -25,7 +25,7 @@ jobs:
     steps:
       - uses: geslar-eu/secrets-action@<full-40-character-commit-sha>   # pin by SHA
         with:
-          version: 1.2.3            # exact @geslar/cli version — required, no default
+          version: 1.0.0            # exact @geslar/cli version — required, no default
           secrets: |
             DB_PASSWORD=geslar://Production/database/password
             API_TOKEN=geslar://Production/payments/token
@@ -36,7 +36,7 @@ jobs:
       - run: ./deploy.sh            # DB_PASSWORD and API_TOKEN are in the environment from here on
 ```
 
-Each line of `secrets` is `NAME=geslar://vault/item[/field]`. Vaults and items are given **by name** (the machine identity sees only the Vaults you gave it); the field defaults to `password`. A `NAME` is a plain variable name; names that would change how later steps run are refused (`PATH`, `NODE_OPTIONS`, `LD_*`, `BASH_ENV`, `GITHUB_*`, `RUNNER_*`, `GESLAR_*` and the like). At most 100 secrets per step; each name once.
+Each line of `secrets` is `NAME=geslar://vault/item[/field]`. Vaults and items are given **by name** (the machine identity sees only the Vaults you gave it); the field defaults to `password`. The keywords `personal`, `osobno`, `family`, `company` and `work`, which the CLI accepts for a person's own organizations, are not resolved for a service account. A `NAME` starts with a letter or `_`, continues with letters, digits and `_`, and is at most 128 characters. Names that would change how later steps run are refused, compared without regard to case: the prefixes `GITHUB_`, `RUNNER_`, `ACTIONS_`, `INPUT_`, `STATE_`, `GESLAR_`, `LD_`, `DYLD_`, `NODE_`, `NPM_` and `BASH_`, and exactly `PATH`, `HOME`, `SHELL`, `ENV`, `IFS`, `PS4`, `CI`, `TMPDIR`, `BASH`, `BASHOPTS`, `SHELLOPTS`, `PROMPT_COMMAND`, `PYTHONPATH`, `PYTHONHOME`, `PERL5LIB`, `RUBYLIB`, `CLASSPATH`, `JAVA_TOOL_OPTIONS` and `_JAVA_OPTIONS`. At most 100 secrets per step; each name once (also compared without regard to case).
 
 ### Inputs
 
@@ -81,7 +81,7 @@ Workflows triggered by a fork get no secrets, so the action stops there with a c
 
 ### Runners
 
-Tested in this repository's CI on `ubuntu-24.04` and `macos-14` (the scripts are plain bash and avoid features missing from the bash 3.2 that macOS ships). Windows runners are not tested.
+Tested in this repository's CI, with a fake CLI, on `ubuntu-24.04` and `macos-14` (the scripts are plain bash and avoid features missing from the bash 3.2 that macOS ships). The manual e2e workflow (real runners, real CLI) also covers `windows-2022`; the action makes no support statement for Windows until a run of it has been recorded for a release (see [RELEASING.md](./RELEASING.md)).
 
 ## Failure behaviour
 
