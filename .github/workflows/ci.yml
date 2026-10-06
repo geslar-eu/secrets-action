@@ -33,7 +33,7 @@ jobs:
         run: |
           set -euo pipefail
           shellcheck --version
-          shellcheck -x -S style scripts/load.sh scripts/install.sh tests/run.sh tests/fake-bin/geslar
+          shellcheck -x -S style scripts/load.sh scripts/install.sh tests/run.sh tests/fake-bin/geslar tests/secrets-action-redteam-extra.sh
 
   test:
     name: tests (${{ matrix.os }})
@@ -53,3 +53,6 @@ jobs:
 
       - name: tests with a fake CLI (masking, multi-line, delimiter, token never logged, bad reference)
         run: bash tests/run.sh
+
+      - name: red team extra attacks (forged env block, metacharacters in a reference, control characters in version and name)
+        run: bash tests/secrets-action-redteam-extra.sh
