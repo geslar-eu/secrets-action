@@ -2,7 +2,7 @@
 
 A GitHub Action that loads secrets from [Geslar](https://geslar.app) into a workflow job, **masked**, using a Geslar **service account** token.
 
-> **Status.** Pin this action by full commit SHA (see [Pin it](#pin-it)). Release tags (`v1.0.0` and the moving `v1`) are created by a maintainer by hand after the checks in [RELEASING.md](./RELEASING.md); a tag is for people who accept a moving reference. The `@geslar/cli` version the action installs is yours to choose with the `version` input. It has to be **1.0.0 or newer** (the trial version `1.0.0-rc.1` also works), because earlier versions do not know service tokens.
+> **Status.** Pin this action by full commit SHA (see [Pin it](#pin-it)). Release tags (`v1.0.0` and the moving `v1`) are created by a maintainer by hand after the checks in [RELEASING.md](./RELEASING.md); a tag is for people who accept a moving reference. The `@geslar/cli` version the action installs is yours to choose with the `version` input. It has to be a version that supports service account tokens — earlier CLI versions do not, and the CLI's own changelog says since when.
 
 ## What it does
 
@@ -25,7 +25,7 @@ jobs:
     steps:
       - uses: geslar-eu/secrets-action@<full-40-character-commit-sha>   # pin by SHA
         with:
-          version: 1.0.0            # exact @geslar/cli version — required, no default
+          version: 1.2.3            # exact @geslar/cli version — required, no default
           secrets: |
             DB_PASSWORD=geslar://Production/database/password
             API_TOKEN=geslar://Production/payments/token
@@ -42,7 +42,7 @@ Each line of `secrets` is `NAME=geslar://vault/item[/field]`. Vaults and items a
 
 | Input | Required | Meaning |
 |---|---|---|
-| `version` | yes | Exact `@geslar/cli` version: `x.y.z`, or one exact pre-release such as `1.0.0-rc.1`. No default, no range, no tag (`latest` and `next` are refused). |
+| `version` | yes | Exact `@geslar/cli` version: `x.y.z`, or one exact pre-release such as `x.y.z-rc.1`. No default, no range, no tag (`latest` and `next` are refused). |
 | `secrets` | yes | The list above. |
 
 The token is deliberately **not** an input: inputs appear in the invocation log. Pass it as the `env:` of the step, from a repository or environment **secret** (never from `vars`).
