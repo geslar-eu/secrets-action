@@ -1,6 +1,6 @@
 name: e2e (manual, real runners, real CLI)
 
-# Run by hand (Actions → e2e → Run workflow) against the trial release of @geslar/cli. Needs the repository secret
+# Run by hand (Actions → e2e → Run workflow) against the @geslar/cli version named in `version`. Needs the repository secret
 # GESLAR_SERVICE_TOKEN of a TEST service account that can read one probe item in a test Vault — see RELEASING.md.
 # It proves the two things the fake-CLI tests cannot: that a calling step's `env:` reaches the composite action's inner
 # steps, and that the real CLI resolves a reference with a service token.
@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: Exact @geslar/cli version to test (for example 1.0.0-rc.1)
+        description: Exact @geslar/cli version to test
         required: true
         type: string
       reference:

@@ -4,13 +4,13 @@ Releases (the tags `v1.0.0` and the moving `v1`) are created **by a maintainer a
 
 ## Mandatory checks before the first tag
 
-Two things cannot be proven by the fake-CLI tests in `tests/run.sh` and **must** be verified on a real runner with the trial release of the CLI (`@geslar/cli@1.0.0-rc.1`, npm dist-tag `next`) before any tag exists. Record the result of each in the release issue/PR (run link and what you saw).
+Two things cannot be proven by the fake-CLI tests in `tests/run.sh` and **must** be verified on a real runner with the real CLI, at the version named in the e2e workflow's `version` input, before any tag exists. Record the result of each in the release issue/PR (run link and what you saw).
 
 ### A. The calling step's `env:` reaches the composite action's inner steps
 
 The action reads `GESLAR_SERVICE_TOKEN` from the environment of its inner steps, and the caller sets it as `env:` on the `uses:` step. That this is inherited is an assumption until it has run for real.
 
-1. Run the **e2e** workflow (Actions → *e2e (manual, real runners, real CLI)* → Run workflow) with `version` = the trial release and `reference` = the probe item (setup below).
+1. Run the **e2e** workflow (Actions → *e2e (manual, real runners, real CLI)* → Run workflow) with `version` = the CLI version being verified and `reference` = the probe item (setup below).
 2. Expected on every OS: the step *load the probe secret…* **passes**, and the step *negative control — without the token the action must fail* is shown as failed-but-allowed (`continue-on-error`) while *the negative control really failed* is **skipped**.
 3. If the first step fails with `GESLAR_SERVICE_TOKEN is not set`, the assumption is wrong: stop, the token handoff has to change (for example an explicit `env:` in `action.yml` fed from an input that is a secret reference) before release.
 
@@ -38,4 +38,4 @@ Every `uses:` in `action.yml` and `.github/workflows/*` is a full commit SHA; th
 
 Only when A–E are recorded: a maintainer creates the tag `v1.0.0` on the verified commit and moves `v1` to it. Documentation then tells people to pin the action by **commit SHA**; the tags are for people who accept moving references.
 
-If A or B fails, nothing is tagged. The trial release is only ever installed by its exact version (`1.0.0-rc.1`); the action refuses `latest` and `next`.
+If A or B fails, nothing is tagged. The CLI is only ever installed by its exact version; the action refuses `latest` and `next`.
